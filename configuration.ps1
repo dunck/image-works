@@ -41,3 +41,10 @@ $VMSettings =
     }
 
 }
+
+$GeneralSettings =
+@{
+    "HyperVServerFQDN" = $XmlConfiguration.Environment.HyperVServerFQDN
+    "MDTServerFQDN" = $XmlConfiguration.Environment.MDTVServerFQDN
+    "MDTDeploymentShareUNC" = $XmlConfiguration.Environment.DeploymentShareUNC
+}

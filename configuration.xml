@@ -5,6 +5,7 @@
 
 <Configuration>
     <Environment>
+        <HyperVServerFQDN>magic.gov</HyperVServerFQDN>
         <VHDXPath>\\magic.gov\DeploymentShare$\ImageFactory.vhdx</VHDXPath>
         <DeploymentShareUNC>\\magic.gov\DeploymentShare$</DeploymentShareUNC>
     </Environment>
