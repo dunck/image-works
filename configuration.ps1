@@ -32,7 +32,7 @@ $VMSettings =
 
     "DVDDrive" =
     @{
-        "Path"   = $XmlConfiguration.Environment.DeploymentShareUNC + "\Boot\LiteTouchPE_x64.iso"
+        "Path" = $XmlConfiguration.Environment.DeploymentShareUNC + "\Boot\LiteTouchPE_x64.iso"
     }
 
     "BIOS" =

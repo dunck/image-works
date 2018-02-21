@@ -11,6 +11,8 @@
 
 .".\configuration.ps1"
 
+$ImageFactoryVMName = "ImageFactory01"
+
 $PSDefaultParameterValues =
 @{
     "Test-Connection:Count"      = 1
@@ -19,7 +21,8 @@ $PSDefaultParameterValues =
 
 Function Assert-IFEnvironment()
 {
-    $Assertions = @{
+    $Assertions =
+    @{
         "HyperVConnection" = [boolean]
         (
             Test-Connection $HyperVServerFQDN
@@ -61,7 +64,32 @@ Function Assert-IFEnvironment()
 
 Function New-IFVM($VMName)
 {
+    $Settings = $VMSettings.General
 
+    Try
+    {
+        Write-Host "Creating new virtual machine."
+        New-VM -Name $VMName @Settings -Verbose
+    }
+    Catch
+    {
+        # Add error cases - possible errors include: VM with same name already
+        #  existing, "unable to realize" error, invalid switch name, invalid
+        #  or inaccessible VHD path
+    }
+    Finally
+    {
+        $VMDetails = Get-VM -Name $VMName
+        If(!([boolean]($VMDetails)))
+        {
+            Write-Host "Failed to create virtual machine."
+        }
+        Else
+        {
+            Write-Host "Created virtual machine:"
+            Format-List $VMDetails
+        }
+    }
 }
 
 Function Set-IFVM($VMName)
@@ -76,8 +104,8 @@ Function Start-IFVM($VMName)
 
 Assert-IFEnvironment
 
-New-IFVM "ImageFactory01"
+New-IFVM $ImageFactoryVMName
 
-Set-IFVM "ImageFactory01"
+Set-IFVM $ImageFactoryVMName
 
-Start-IFVM "ImageFactory01"
+Start-IFVM $ImageFactoryVMName
