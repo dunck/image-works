@@ -27,7 +27,7 @@ $VMSettings =
 
     "NetworkAdapter" =
     @{
-        "StaticMacAddress" = $XmlConfiguration.Network.ReservedStaticIP # this needs to be an IP that can reach Microsoft Update, if not using WSUS/similar
+        "StaticIPAddress" = $XmlConfiguration.Network.ReservedStaticIP # this needs to be an IP that can reach Microsoft Update, if not using WSUS/similar
     }
 
     "DVDDrive" =

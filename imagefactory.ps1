@@ -8,6 +8,7 @@
 <# 2   Unable to connect to MDT host
 <# 3   Unable to connect to MDT DeploymentShare
 <# 4   Unable to validate given Hyper-V switch name
+<# 5   Unable to confirm availability
 <#>
 
 .".\configuration.ps1"
@@ -39,6 +40,10 @@ Function Assert-IFEnvironment()
         "HyperVSwitchNameIsValid" = [boolean]
         (
             Get-VMSwitch $VMSettings.General.SwitchName
+        )
+        "StaticIPIsAvailable" = -not [boolean]
+        (
+            Test-Connection $VMSettings.NetworkAdapter.StaticIPAddress
         )
     }
 
@@ -89,6 +94,19 @@ Function Assert-IFEnvironment()
     Else
     {
         Write-Host "Hyper-V switch is valid."
+    }
+
+    If(!($Assertions.StaticIPIsAvailable))
+    {
+        Write-Host "Static IP is currently being used."
+        Write-Host "Static IP given: $($GeneralSettings.NetworkAdapter.StaticIPAddress)"
+        Write-Host "Hostname of device using IP: $([System.Net.DNS]::GetHostByAddress($GeneralSettings.NetworkAdapter.StaticIPAddress).HostName)"
+
+        Exit 5
+    }
+    Else
+    {
+        Write-Host "Static IP is available for use."
     }
 }
 
