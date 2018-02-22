@@ -9,6 +9,7 @@
 <# 3   Unable to connect to MDT DeploymentShare
 <# 4   Unable to validate given Hyper-V switch name
 <# 5   Unable to confirm availability
+<# 6   VHD path is not accessible or available
 <#>
 
 .".\configuration.ps1"
@@ -23,7 +24,7 @@ $PSDefaultParameterValues =
 
 Function Assert-IFEnvironment()
 {
-    $GeneralSettings = $VMSettings.General    
+    $GeneralSettings = $VMSettings.General
 
     $Assertions =
     @{
@@ -46,6 +47,10 @@ Function Assert-IFEnvironment()
         "StaticIPIsAvailable" = -not [boolean]
         (
             Test-Connection $VMSettings.NetworkAdapter.StaticIPAddress
+        )
+        "VHDPathIsAvailable" = -not [boolean]
+        (
+            Test-Path $VMSettings.General.NewVHDPath
         )
     }
 
@@ -109,6 +114,19 @@ Function Assert-IFEnvironment()
     Else
     {
         Write-Host "Static IP is available for use."
+    }
+
+    If(!($Assertions.VHDPathIsAvailable))
+    {
+        Write-Host "VHD path is not accessible or available."
+        Write-Host "Path given: $($GeneralSettings.General.NewVHDPath)"
+        Get-Item $GeneralSettings.General.NewVHDPath
+
+        Exit 6
+    }
+    Else
+    {
+        Write-Host "VHD path is available."
     }
 }
 
