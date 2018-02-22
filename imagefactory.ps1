@@ -7,6 +7,7 @@
 <# 1   Unable to connect to Hyper-V host
 <# 2   Unable to connect to MDT host
 <# 3   Unable to connect to MDT DeploymentShare
+<# 4   Unable to validate given Hyper-V switch name
 <#>
 
 .".\configuration.ps1"
@@ -23,53 +24,82 @@ Function Assert-IFEnvironment()
 {
     $Assertions =
     @{
-        "HyperVConnection" = [boolean]
+        "HyperVConnectionIsValid" = [boolean]
         (
-            Test-Connection $HyperVServerFQDN
+            Test-Connection $GeneralSettings.HyperVServerFQDN
         )
-        "MDTConnection" = [boolean]
+        "MDTConnectionIsValid" = [boolean]
         (
-            Test-Connection $MDTServerFQDN
+            Test-Connection $GeneralSettings.MDTServerFQDN
         )
-        "DeploymentShareConnection" = [boolean]
+        "DeploymentShareConnectionIsValid" = [boolean]
         (
-            Test-Path $MDTDeploymentShareUNC
+            Test-Path $GeneralSettings.MDTDeploymentShareUNC
+        )
+        "HyperVSwitchNameIsValid" = [boolean]
+        (
+            Get-VMSwitch $VMSettings.General.SwitchName
         )
     }
 
-    If(!($Assertions.HyperVConnection))
+    If(!($Assertions.HyperVConnectionIsValid))
     {
         Write-Host "Unable to connect to Hyper-V host."
-        Write-Host "FQDN given: $HyperVServerFQDN"
+        Write-Host "FQDN given: $($GeneralSettings.HyperVServerFQDN)"
 
         Exit 1
     }
+    Else
+    {
+        Write-Host "Connection to Hyper-V host is valid."
+    }
 
-    If(!($Assertions.MDTConnection))
+    If(!($Assertions.MDTConnectionIsValid))
     {
         Write-Host "Unable to connect to MDT host."
-        Write-Host "FQDN given: $MDTServerFQDN"
+        Write-Host "FQDN given: $($GeneralSettings.MDTServerFQDN)"
 
         Exit 2
     }
+    Else
+    {
+        Write-Host "Connection to MDT host is valid."
+    }
 
-    If(!($Assertions.DeploymentShareConnection))
+    If(!($Assertions.DeploymentShareConnectionIsValid))
     {
         Write-Host "Unable to connect to MDT DeploymentShare."
-        Write-Host "UNC given: $DeploymentShareUNC"
+        Write-Host "UNC given: $($GeneralSettings.MDTDeploymentShareUNC)"
 
         Exit 3
+    }
+    Else
+    {
+        Write-Host "DeploymentShare location is valid."
+    }
+
+    If(!($Assertions.HyperVSwitchNameIsValid))
+    {
+        Write-Host "Unable to validate given Hyper-V switch name."
+        Write-Host "Switch given: $($VMSettings.General.SwitchName)"
+        Write-Host "Available switches: $((Get-VMSwitch).Name -replace "(.+)","'`$1'" -join ",")"
+
+        Exit 4
+    }
+    Else
+    {
+        Write-Host "Hyper-V switch is valid."
     }
 }
 
 Function New-IFVM($VMName)
 {
-    $Settings = $VMSettings.General
+    $GeneralSettings = $VMSettings.General
 
     Try
     {
         Write-Host "Creating new virtual machine."
-        New-VM -Name $VMName @Settings -Verbose
+        New-VM -Name $VMName @GeneralSettings -Verbose
     }
     Catch
     {
@@ -87,7 +117,7 @@ Function New-IFVM($VMName)
         Else
         {
             Write-Host "Created virtual machine:"
-            Format-List $VMDetails
+            $VMDetails | Format-List
         }
     }
 }
