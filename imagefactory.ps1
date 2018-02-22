@@ -23,6 +23,8 @@ $PSDefaultParameterValues =
 
 Function Assert-IFEnvironment()
 {
+    $GeneralSettings = $VMSettings.General    
+
     $Assertions =
     @{
         "HyperVConnectionIsValid" = [boolean]

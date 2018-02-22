@@ -19,9 +19,9 @@ $VMSettings =
 
     "Processor" =
     @{
-        "Count"          = 4
-        "Reserve"        = 10
-        "Maximum"        = 75
+        "Count"          = 4   # virtual processors
+        "Reserve"        = 10  # keep 10% of system resources as reserve for this VM
+        "Maximum"        = 75  # only use, at most, 75% of system resources
         "RelativeWeight" = 200 # modify this to your liking
     }
 
