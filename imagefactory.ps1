@@ -10,6 +10,7 @@
 <# 4   Unable to validate given Hyper-V switch name
 <# 5   Unable to confirm availability
 <# 6   VHD path is not accessible or available
+<# 7   VM name is taken
 <#>
 
 .".\configuration.ps1"
@@ -51,6 +52,10 @@ Function Assert-IFEnvironment()
         "VHDPathIsAvailable" = -not [boolean]
         (
             Test-Path $VMSettings.General.NewVHDPath
+        )
+        "VMNameNotInUse" = -not [boolean]
+        (
+            Get-VM $ImageFactoryVMName
         )
     }
 
@@ -127,6 +132,18 @@ Function Assert-IFEnvironment()
     Else
     {
         Write-Host "VHD path is available."
+    }
+
+    If(!($Assertions.VMNameNotInUse))
+    {
+        Write-Host "VM name is taken."
+        Get-VM $ImageFactoryVMName
+
+        Exit 7
+    }
+    Else
+    {
+        Write-Host "VM name is available."
     }
 }
 
